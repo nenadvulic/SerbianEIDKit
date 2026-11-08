@@ -90,8 +90,8 @@ public final class SerbianEIDReader {
     /// Selects the eID applet and reads the document, personal and residence files.
     public func readAll() async throws -> EidDocument {
         try await withSession {
-            try await self.selectAID()
-            var document = EidDocument()
+            let variant = try await self.selectAID()
+            var document = EidDocument(variant: variant)
             try await self.readFile(EidProtocol.documentFile, into: &document)
             try await self.readFile(EidProtocol.personalFile, into: &document)
             try await self.readFile(EidProtocol.residenceFile, into: &document)
@@ -118,18 +118,21 @@ public final class SerbianEIDReader {
     // MARK: SELECT AID
 
     /// Selects the eID applet, trying the three AID variants in turn.
-    private func selectAID() async throws {
-        let labels = ["SERID (citizen)", "SERIF (foreigner)", "SERRP (residence)"]
+    /// - Returns: the matched ``EidCardVariant``.
+    /// - Throws: ``EidError/unsupportedCard`` if none of the variants is accepted.
+    @discardableResult
+    private func selectAID() async throws -> EidCardVariant {
+        let variants: [EidCardVariant] = [.citizen, .foreigner, .residence]
         for (index, aid) in EidProtocol.allAIDs.enumerated() {
             // 00 A4 04 0C <Lc=0B> <AID(11)>
             let apdu = [0x00, 0xA4, 0x04, 0x0C, UInt8(aid.count)] + aid
             let (_, sw1, sw2) = try await transmit(apdu)
             if sw1 == 0x90 && sw2 == 0x00 {
-                log("✓ applet selected: \(labels[index])")
-                return
+                log("✓ applet selected: \(variants[index])")
+                return variants[index]
             }
         }
-        throw EidError.apduFailed(statusWord: "—", context: "selectAID (no variant accepted)")
+        throw EidError.unsupportedCard
     }
 
     // MARK: File read + TLV parsing

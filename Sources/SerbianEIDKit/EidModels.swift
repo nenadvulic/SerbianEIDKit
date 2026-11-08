@@ -53,6 +53,13 @@ public enum EidField: Int, CaseIterable, Sendable {
     case addressLabel      = 1581
 }
 
+/// Which variant of the card was read, determined by the selected applet (AID).
+public enum EidCardVariant: String, Codable, Sendable, CaseIterable {
+    case citizen     // SERID
+    case foreigner   // SERIF
+    case residence   // SERRP
+}
+
 /// The decoded contents of an eID card.
 public struct EidDocument: Equatable, Sendable {
     /// Known field values, keyed by their ``EidField``.
@@ -62,9 +69,15 @@ public struct EidDocument: Equatable, Sendable {
     /// Kept so no data read from the card is silently discarded.
     public var unknownFields: [Int: String]
 
-    public init(fields: [EidField: String] = [:], unknownFields: [Int: String] = [:]) {
+    /// The card variant that was read (citizen / foreigner / residence permit).
+    public var variant: EidCardVariant?
+
+    public init(fields: [EidField: String] = [:],
+                unknownFields: [Int: String] = [:],
+                variant: EidCardVariant? = nil) {
         self.fields = fields
         self.unknownFields = unknownFields
+        self.variant = variant
     }
 
     /// Returns the value for a field, or an empty string if absent.
@@ -101,6 +114,8 @@ public struct EidDocument: Equatable, Sendable {
 public enum EidError: Error, CustomStringConvertible, Sendable {
     /// No card reader / slot with a present card was found.
     case noReader
+    /// A card is present but it is not a Serbian eID (none of the applets could be selected).
+    case unsupportedCard
     /// The card did not answer as a Serbian eID (unexpected ATR).
     case cardNotRecognized(atr: String)
     /// An APDU command returned a non-success status word.
@@ -112,6 +127,8 @@ public enum EidError: Error, CustomStringConvertible, Sendable {
         switch self {
         case .noReader:
             return "No card reader or slot is available."
+        case .unsupportedCard:
+            return "The inserted card is not a Serbian identity card."
         case .cardNotRecognized(let atr):
             return "Card not recognized as a Serbian eID. ATR=\(atr)"
         case .apduFailed(let sw, let context):
@@ -119,5 +136,18 @@ public enum EidError: Error, CustomStringConvertible, Sendable {
         case .transport(let message):
             return "Transport error: \(message)"
         }
+    }
+}
+
+public extension EidField {
+    /// A stable string identifier for the field (its Swift case name), used for serialization.
+    var key: String { String(describing: self) }
+
+    /// Reverse lookup from a ``key`` string.
+    init?(key: String) {
+        guard let match = EidField.allCases.first(where: { String(describing: $0) == key }) else {
+            return nil
+        }
+        self = match
     }
 }

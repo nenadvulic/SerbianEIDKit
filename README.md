@@ -54,7 +54,27 @@ let jpeg = try await reader.readPhoto()        // UIImage(data:) / NSImage(data:
 ```
 
 `readAll()` returns an ``EidDocument``; known fields are in `fields` (keyed by `EidField`),
-and any extra tags are in `unknownFields`.
+and any extra tags are in `unknownFields`. `document.variant` tells you which card was read
+(`.citizen` / `.foreigner` / `.residence`), and a non-ID card throws `EidError.unsupportedCard`.
+
+### Latin transliteration
+
+The card stores most personal fields in Cyrillic. Get a Latin copy (Gaj's Latin):
+
+```swift
+let latin = document.latinized()               // "КРСТИЋ" → "KRSTIĆ"
+SerbianTransliteration.toLatin("ЊЕГОШ")        // "NJEGOŠ"
+```
+
+### JSON serialization
+
+`EidDocument` is `Codable` — useful to send the document to a backend (KYC/onboarding),
+cache it, or snapshot it in tests. Keys are human-readable (`surname`, `givenName`, …):
+
+```swift
+let json = try JSONEncoder().encode(document)
+let back = try JSONDecoder().decode(EidDocument.self, from: json)
+```
 
 ## How the card is read
 
