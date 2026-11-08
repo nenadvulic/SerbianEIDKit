@@ -141,11 +141,11 @@ Dates are `DDMMYYYY`; `EidDocument.formatDate` renders them as `DD.MM.YYYY`.
 [`Examples/EidReaderDemo`](Examples/EidReaderDemo) is a minimal SwiftUI app that uses the
 package: tap **Read card** to display the fields, the photo and the APDU log.
 
-## Relation to bas-celik
+## Credits
 
-The field mapping is consistent with [bas-celik](https://github.com/ubavic/bas-celik)
-(the reference Go reader). SerbianEIDKit additionally preserves unmapped tags in
-`unknownFields`.
+The field mapping and read protocol are consistent with
+[bas-celik](https://github.com/ubavic/bas-celik), the reference desktop reader for Serbian
+documents. This package focuses on reading the identity card's data files on Apple platforms.
 
 ## License
 
