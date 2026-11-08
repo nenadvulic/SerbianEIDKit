@@ -1,5 +1,7 @@
 # SerbianEIDKit
 
+[![CI](https://github.com/nenadvulic/SerbianEIDKit/actions/workflows/ci.yml/badge.svg)](https://github.com/nenadvulic/SerbianEIDKit/actions/workflows/ci.yml)
+
 A small, dependency-free Swift package that reads the **Serbian electronic identity
 card (lična karta / лична карта)** from a contact smart-card reader on **iOS/iPadOS 16+**
 and **macOS 13+**, using Apple's [CryptoTokenKit](https://developer.apple.com/documentation/cryptotokenkit)
