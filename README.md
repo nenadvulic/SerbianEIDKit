@@ -10,7 +10,7 @@ and **macOS 13+**, using Apple's [CryptoTokenKit](https://developer.apple.com/do
 The card is read **in the clear**: no PIN, no secure messaging (BAC/PACE). The protocol
 was reconstructed from the official reader application and validated against real cards.
 
-> ⚖️ For interoperability and research on **your own** card. eID data is personal data —
+> ⚖️ For interoperability and research on **your own** card. eID data is personal data,
 > handle it accordingly.
 
 ## Features
@@ -22,7 +22,7 @@ was reconstructed from the official reader application and validated against rea
 
 ## Installation
 
-Swift Package Manager — add the dependency in Xcode
+Swift Package Manager: add the dependency in Xcode
 (*File ▸ Add Package Dependencies…*) with this repository's URL, or in `Package.swift`:
 
 ```swift
@@ -68,7 +68,7 @@ SerbianTransliteration.toLatin("ЊЕГОШ")        // "NJEGOŠ"
 
 ### JSON serialization
 
-`EidDocument` is `Codable` — useful to send the document to a backend (KYC/onboarding),
+`EidDocument` is `Codable`, useful to send the document to a backend (KYC/onboarding),
 cache it, or snapshot it in tests. Keys are human-readable (`surname`, `givenName`, …):
 
 ```swift
@@ -86,7 +86,7 @@ The card is an ISO&nbsp;7816-4 contact chip. Reading is a fixed sequence of APDU
 00 A4 04 0C 0B  F3 81 00 00 02 53 45 52 49 44 01
 ```
 
-The AID ends in an ASCII tag identifying the card variant — `SERID` (citizen),
+The AID ends in an ASCII tag identifying the card variant: `SERID` (citizen),
 `SERIF` (foreigner) or `SERRP` (residence permit). The reader tries all three.
 
 ### 2. Read each elementary file
@@ -155,7 +155,7 @@ Dates are `DDMMYYYY`; `EidDocument.formatDate` renders them as `DD.MM.YYYY`.
 
 - Requires a **CCID** contact reader. On an iPhone 15+/iPad with USB-C, a USB-C reader
   (or a USB reader via a USB-C adapter) connects directly.
-- Some readers draw more power than a phone supplies — a **powered USB-C hub** helps.
+- Some readers draw more power than a phone supplies, a **powered USB-C hub** helps.
 - Does **not** work on the iOS Simulator (`TKSmartCardSlotManager.default` is `nil`).
 
 ## Example app
@@ -171,4 +171,4 @@ documents. This package focuses on reading the identity card's data files on App
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
